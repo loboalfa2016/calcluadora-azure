@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    image: emanuel35/calculator-backend:latest
+    container_name: calculator_backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=8080
+    restart: unless-stopped
+
+  frontend:
+    image: emanuel35/calculator-frontend:latest
+    container_name: calculator_frontend
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=8080
+      - BackendUrl=http://backend:8080
+    depends_on:
+      - backend
+    restart: unless-stopped

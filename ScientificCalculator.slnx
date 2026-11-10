@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ScientificCalculator.Backend/ScientificCalculator.Backend.csproj" />
+  <Project Path="ScientificCalculator.Frontend/ScientificCalculator.Frontend.csproj" />
+</Solution>

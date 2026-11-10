@@ -1,0 +1,348 @@
+﻿@{
+    ViewData["Title"] = "Calculadora Científica & Convertidor (.NET 10)";
+}
+
+<div class="container py-4">
+    <div class="row mb-3">
+        <div class="col-12 text-center">
+            <h2 class="fw-bold text-primary">
+                <i class="bi bi-cpu"></i> Calculadora Científica & Convertidor
+            </h2>
+            <p class="text-muted">Desarrollado en <strong>.NET 10</strong> con Arquitectura Micro-servicios (Frontend MVC + Backend Web API en Docker)</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Columna de Calculadora -->
+        <div class="col-lg-7">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-2">
+                    <span class="fw-bold"><i class="bi bi-calculator"></i> Calculadora Científica</span>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <input type="radio" class="btn-check" name="angleMode" id="degMode" value="DEG" checked autocomplete="off">
+                        <label class="btn btn-outline-light" for="degMode">DEG</label>
+                        <input type="radio" class="btn-check" name="angleMode" id="radMode" value="RAD" autocomplete="off">
+                        <label class="btn btn-outline-light" for="radMode">RAD</label>
+                    </div>
+                </div>
+                <div class="card-body bg-light">
+                    <!-- Visor de Resultados -->
+                    <div class="bg-dark text-white p-3 rounded text-end mb-3 font-monospace shadow-sm">
+                        <div id="subDisplay" class="text-secondary small" style="min-height: 22px;"></div>
+                        <div id="mainDisplay" class="fs-1 fw-bold text-truncate text-success">0</div>
+                    </div>
+
+                    <!-- Mensajes de Error -->
+                    <div id="calcAlert" class="alert alert-danger d-none py-2 mb-3" role="alert"></div>
+
+                    <!-- Botonera -->
+                    <div class="row g-2">
+                        <!-- Fila 1: Científicas -->
+                        <div class="col-3"><button type="button" class="btn btn-secondary w-100 py-2" onclick="execSingleOp('sin')">sin</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-secondary w-100 py-2" onclick="execSingleOp('cos')">cos</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-secondary w-100 py-2" onclick="execSingleOp('tan')">tan</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-danger w-100 py-2 fw-bold" onclick="clearAll()">C</button></div>
+
+                        <!-- Fila 2: Científicas -->
+                        <div class="col-3"><button type="button" class="btn btn-secondary w-100 py-2" onclick="execSingleOp('ln')">ln</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-secondary w-100 py-2" onclick="execSingleOp('log10')">log₁₀</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-secondary w-100 py-2" onclick="execSingleOp('sqrt')">√x</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-secondary w-100 py-2" onclick="execSingleOp('factorial')">n!</button></div>
+
+                        <!-- Fila 3: Números y Operaciones Básicas -->
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('7')">7</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('8')">8</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('9')">9</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-warning w-100 py-2 fw-bold fs-5" onclick="setBinaryOp('divide')">÷</button></div>
+
+                        <!-- Fila 4 -->
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('4')">4</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('5')">5</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('6')">6</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-warning w-100 py-2 fw-bold fs-5" onclick="setBinaryOp('multiply')">×</button></div>
+
+                        <!-- Fila 5 -->
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('1')">1</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('2')">2</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('3')">3</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-warning w-100 py-2 fw-bold fs-5" onclick="setBinaryOp('subtract')">-</button></div>
+
+                        <!-- Fila 6 -->
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDigit('0')">0</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-light border w-100 py-2 fw-bold fs-5" onclick="appendDecimal()">.</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-info text-white w-100 py-2 fw-bold fs-5" onclick="setBinaryOp('power')">xʸ</button></div>
+                        <div class="col-3"><button type="button" class="btn btn-warning w-100 py-2 fw-bold fs-5" onclick="setBinaryOp('add')">+</button></div>
+
+                        <!-- Fila 7: Resolver -->
+                        <div class="col-12 mt-3">
+                            <button type="button" class="btn btn-primary w-100 py-3 fw-bold fs-4 shadow-sm" onclick="calculateEqual()">=</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Lateral: Historial y Convertidor de Unidades -->
+        <div class="col-lg-5">
+            <!-- Historial de Operaciones -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-clock-history"></i> Historial (Últimas 5)</span>
+                    <button class="btn btn-outline-light btn-sm py-0 px-2" onclick="clearHistory()">Limpiar</button>
+                </div>
+                <div class="card-body p-2">
+                    <ul id="historyList" class="list-group list-group-flush small">
+                        <li class="list-group-item text-muted text-center py-3">Sin cálculos en esta sesión</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Convertidor de Unidades -->
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="bi bi-arrow-left-right"></i> Convertidor de Unidades
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Categoría:</label>
+                        <select id="convCategory" class="form-select" onchange="updateUnitOptions()">
+                            <option value="length">Longitud (m, km, cm, in, ft)</option>
+                            <option value="mass">Masa (g, kg, lb, oz)</option>
+                            <option value="temperature">Temperatura (°C, °F, K)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Valor a Convertir:</label>
+                        <input type="number" id="convValue" class="form-control" value="1" step="any">
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">De:</label>
+                            <select id="convFrom" class="form-select"></select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">A:</label>
+                            <select id="convTo" class="form-select"></select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary w-100 fw-bold py-2" onclick="executeConversion()">
+                        Convertir Unidades
+                    </button>
+                    <div id="convResult" class="mt-3 p-3 bg-light rounded text-center fw-bold text-primary border">
+                        Resultado: Esperando conversión
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let currentInput = "0";
+    let previousOperand = null;
+    let currentOperation = null;
+    let shouldResetDisplay = false;
+    let history = [];
+
+    const mainDisplay = document.getElementById("mainDisplay");
+    const subDisplay = document.getElementById("subDisplay");
+    const alertBox = document.getElementById("calcAlert");
+    const historyList = document.getElementById("historyList");
+
+    function getAngleMode() {
+        return document.querySelector('input[name="angleMode"]:checked').value;
+    }
+
+    function appendDigit(d) {
+        hideAlert();
+        if (currentInput === "0" || shouldResetDisplay) {
+            currentInput = d;
+            shouldResetDisplay = false;
+        } else {
+            currentInput += d;
+        }
+        updateDisplay();
+    }
+
+    function appendDecimal() {
+        hideAlert();
+        if (shouldResetDisplay) {
+            currentInput = "0.";
+            shouldResetDisplay = false;
+        } else if (!currentInput.includes(".")) {
+            currentInput += ".";
+        }
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        mainDisplay.innerText = currentInput;
+    }
+
+    function clearAll() {
+        currentInput = "0";
+        previousOperand = null;
+        currentOperation = null;
+        shouldResetDisplay = false;
+        subDisplay.innerText = "";
+        hideAlert();
+        updateDisplay();
+    }
+
+    function hideAlert() {
+        alertBox.classList.add("d-none");
+        alertBox.innerText = "";
+    }
+
+    function showAlert(msg) {
+        alertBox.innerText = msg;
+        alertBox.classList.remove("d-none");
+    }
+
+    function setBinaryOp(op) {
+        if (currentOperation !== null && !shouldResetDisplay) {
+            calculateEqual();
+        }
+        previousOperand = parseFloat(currentInput);
+        currentOperation = op;
+        shouldResetDisplay = true;
+        subDisplay.innerText = `${previousOperand} ${getOpSymbol(op)}`;
+    }
+
+    function getOpSymbol(op) {
+        const symbols = { add: "+", subtract: "-", multiply: "×", divide: "÷", power: "^" };
+        return symbols[op] || op;
+    }
+
+    async function execSingleOp(op) {
+        hideAlert();
+        const payload = {
+            operation: op,
+            operand1: parseFloat(currentInput),
+            angleMode: getAngleMode()
+        };
+
+        await callApi(payload);
+    }
+
+    async function calculateEqual() {
+        if (!currentOperation || previousOperand === null) return;
+
+        const payload = {
+            operation: currentOperation,
+            operand1: previousOperand,
+            operand2: parseFloat(currentInput),
+            angleMode: getAngleMode()
+        };
+
+        await callApi(payload);
+        currentOperation = null;
+        previousOperand = null;
+        subDisplay.innerText = "";
+    }
+
+    async function callApi(payload) {
+        try {
+            const response = await fetch('/api/calculatorproxy/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                currentInput = data.formattedResult;
+                updateDisplay();
+                shouldResetDisplay = true;
+                addHistory(`${data.expression} = ${data.formattedResult}`);
+            } else {
+                showAlert(data.errorMessage || "Error en el cálculo.");
+            }
+        } catch (err) {
+            showAlert("Error de red: No se pudo conectar con el servicio backend.");
+        }
+    }
+
+    function addHistory(entry) {
+        history.unshift(entry);
+        if (history.length > 5) history.pop();
+
+        historyList.innerHTML = history
+            .map(item => `<li class="list-group-item d-flex justify-content-between align-items-center font-monospace">${item}</li>`)
+            .join('');
+    }
+
+    function clearHistory() {
+        history = [];
+        historyList.innerHTML = '<li class="list-group-item text-muted text-center py-3">Sin cálculos en esta sesión</li>';
+    }
+
+    // Unidades
+    const unitMap = {
+        length: [
+            { id: "m", name: "Metros (m)" },
+            { id: "km", name: "Kilómetros (km)" },
+            { id: "cm", name: "Centímetros (cm)" },
+            { id: "in", name: "Pulgadas (in)" },
+            { id: "ft", name: "Pies (ft)" }
+        ],
+        mass: [
+            { id: "g", name: "Gramos (g)" },
+            { id: "kg", name: "Kilogramos (kg)" },
+            { id: "lb", name: "Libras (lb)" },
+            { id: "oz", name: "Onzas (oz)" }
+        ],
+        temperature: [
+            { id: "c", name: "Celsius (°C)" },
+            { id: "f", name: "Fahrenheit (°F)" },
+            { id: "k", name: "Kelvin (K)" }
+        ]
+    };
+
+    function updateUnitOptions() {
+        const cat = document.getElementById("convCategory").value;
+        const from = document.getElementById("convFrom");
+        const to = document.getElementById("convTo");
+        const options = unitMap[cat].map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+        from.innerHTML = options;
+        to.innerHTML = options;
+        if (to.options.length > 1) to.selectedIndex = 1;
+    }
+
+    async function executeConversion() {
+        const payload = {
+            category: document.getElementById("convCategory").value,
+            value: parseFloat(document.getElementById("convValue").value) || 0,
+            fromUnit: document.getElementById("convFrom").value,
+            toUnit: document.getElementById("convTo").value
+        };
+
+        try {
+            const res = await fetch('/api/calculatorproxy/convert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            const resBox = document.getElementById("convResult");
+            if (res.ok && data.success) {
+                resBox.innerText = `${data.expression} = ${data.formattedResult}`;
+                resBox.className = "mt-3 p-3 bg-light rounded text-center fw-bold text-success border border-success";
+            } else {
+                resBox.innerText = data.errorMessage || "Error en conversión";
+                resBox.className = "mt-3 p-3 bg-light rounded text-center fw-bold text-danger border border-danger";
+            }
+        } catch {
+            const resBox = document.getElementById("convResult");
+            resBox.innerText = "Error de conexión con el backend";
+            resBox.className = "mt-3 p-3 bg-light rounded text-center fw-bold text-danger border border-danger";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        updateUnitOptions();
+    });
+</script>
+}
