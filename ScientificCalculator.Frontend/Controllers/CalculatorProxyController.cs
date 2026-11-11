@@ -12,7 +12,7 @@ public class CalculatorProxyController : ControllerBase
     public CalculatorProxyController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClient = httpClientFactory.CreateClient("BackendApi");
-        _backendBaseUrl = configuration["BackendUrl"]?.TrimEnd('/') ?? "http://localhost:8081";
+        _backendBaseUrl = configuration["BackendUrl"]?.TrimEnd('/') ?? "https://app-calculadora-b-c2fqdshzhuguhzbx.brazilsouth-01.azurewebsites.net";
     }
 
     [HttpPost("calculate")]
